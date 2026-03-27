@@ -33,7 +33,9 @@ import {
   CheckSquare,
   Clock,
   Trash2,
-  Edit
+  Edit,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -353,13 +355,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl text-center border border-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800 px-4">
+          <div className="max-w-md w-full bg-white dark:bg-slate-900 p-12 rounded-[3rem] shadow-2xl text-center border border-gray-100 dark:border-slate-800">
             <div className="w-20 h-20 bg-red-100 rounded-3xl flex items-center justify-center text-red-600 mx-auto mb-10">
               <AlertCircle size={40} />
             </div>
             <h1 className="text-2xl font-bold mb-4">Application Error</h1>
-            <p className="text-gray-500 mb-8">{errorMessage}</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-8">{errorMessage}</p>
             <button 
               onClick={() => window.location.reload()} 
               className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all"
@@ -375,7 +377,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-const Navbar = ({ user, onLogout, isAdmin }: { user: FirebaseUser | null, onLogout: () => void, isAdmin: boolean }) => {
+const Navbar = ({ user, onLogout, isAdmin, theme, setTheme }: { user: FirebaseUser | null, onLogout: () => void, isAdmin: boolean, theme: 'light' | 'dark', setTheme: (t: 'light' | 'dark') => void }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -388,23 +390,30 @@ const Navbar = ({ user, onLogout, isAdmin }: { user: FirebaseUser | null, onLogo
   }, [user, isAdmin]);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 h-16 flex items-center px-4 md:px-8">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 h-16 flex items-center px-4 md:px-8">
       <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center">
             <img src={logoImage} alt="Student Solution Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-gray-900">Student Solution</span>
+          <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-gray-100">Student Solution</span>
         </Link>
         
         <div className="flex items-center space-x-6">
-          <Link to="/hostels" className="text-gray-600 hover:text-indigo-600 font-medium hidden md:block">Hostels</Link>
-          <Link to="/tiffin" className="text-gray-600 hover:text-indigo-600 font-medium hidden md:block">Tiffin</Link>
-          <Link to="/swap" className="text-gray-600 hover:text-indigo-600 font-medium hidden md:block">Market</Link>
-          <Link to="/jobs" className="text-gray-600 hover:text-indigo-600 font-medium hidden md:block">Jobs</Link>
+          <Link to="/hostels" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium hidden md:block">Hostels</Link>
+          <Link to="/tiffin" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium hidden md:block">Tiffin</Link>
+          <Link to="/swap" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium hidden md:block">Market</Link>
+          <Link to="/jobs" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 font-medium hidden md:block">Jobs</Link>
+          <button 
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
+            className="flex items-center justify-center p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-slate-800"
+            aria-label="Toggle Dark Mode"
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
           {user ? (
-            <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-gray-100">
-              <Link to="/dashboard" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
+            <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-gray-100 dark:border-slate-800">
+              <Link to="/dashboard" className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 transition-colors">
                 <Bell size={20} />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
@@ -412,7 +421,7 @@ const Navbar = ({ user, onLogout, isAdmin }: { user: FirebaseUser | null, onLogo
                   </span>
                 )}
               </Link>
-              <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 flex items-center space-x-1">
+              <Link to="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 flex items-center space-x-1">
                 <LayoutDashboard size={18} />
                 <span className="hidden sm:inline">Dashboard</span>
               </Link>
@@ -422,8 +431,8 @@ const Navbar = ({ user, onLogout, isAdmin }: { user: FirebaseUser | null, onLogo
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
               )}
-              <img src={user.photoURL || ''} className="w-8 h-8 rounded-full border border-gray-200" alt="" />
-              <button onClick={onLogout} className="text-gray-500 hover:text-red-600 transition-colors">
+              <img src={user.photoURL || ''} className="w-8 h-8 rounded-full border border-gray-200 dark:border-slate-700" alt="" />
+              <button onClick={onLogout} className="text-gray-500 dark:text-gray-400 hover:text-red-600 transition-colors">
                 <LogOut size={20} />
               </button>
             </div>
@@ -447,8 +456,8 @@ const HomeView = () => {
   return (
     <div className="pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Welcome to Student Solution</h1>
-        <p className="text-xl text-gray-500">Everything a student needs, all in one place.</p>
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">Welcome to Student Solution</h1>
+        <p className="text-xl text-gray-500 dark:text-gray-400">Everything a student needs, all in one place.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -456,13 +465,13 @@ const HomeView = () => {
           <Link key={module.id} to={module.path}>
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all h-full flex flex-col"
+              className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none hover:shadow-xl dark:shadow-none transition-all h-full flex flex-col"
             >
               <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6", module.color)}>
                 {module.icon}
               </div>
               <h3 className="text-xl font-bold mb-2">{module.title}</h3>
-              <p className="text-gray-500 flex-grow">{module.desc}</p>
+              <p className="text-gray-500 dark:text-gray-400 flex-grow">{module.desc}</p>
               <div className="mt-6 flex items-center text-indigo-600 font-bold group">
                 Explore <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -558,28 +567,28 @@ const UserDashboard = ({ user, initiatePayment }: {
     <div className="pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div className="flex items-center space-x-6">
-          <img src={user.photoURL || ''} className="w-20 h-20 rounded-3xl border-4 border-white shadow-lg" alt="" />
+          <img src={user.photoURL || ''} className="w-20 h-20 rounded-3xl border-4 border-white shadow-lg dark:shadow-none" alt="" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{user.displayName}</h1>
-            <p className="text-gray-500">{user.email}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{user.displayName}</h1>
+            <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
           </div>
         </div>
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl">
+        <div className="flex bg-gray-100 dark:bg-slate-700/50 p-1.5 rounded-2xl">
           <button 
             onClick={() => setActiveTab('bookings')}
-            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all", activeTab === 'bookings' ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}
+            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all", activeTab === 'bookings' ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-sm dark:shadow-none" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300")}
           >
             My Bookings
           </button>
           <button 
             onClick={() => setActiveTab('listings')}
-            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all", activeTab === 'listings' ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}
+            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all", activeTab === 'listings' ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-sm dark:shadow-none" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300")}
           >
             My Listings
           </button>
           <button 
             onClick={() => setActiveTab('notifications')}
-            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all flex items-center", activeTab === 'notifications' ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-700")}
+            className={cn("px-6 py-2.5 rounded-xl font-bold transition-all flex items-center", activeTab === 'notifications' ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-sm dark:shadow-none" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300")}
           >
             Notifications
             {notifications.some(n => !n.read) && (
@@ -607,18 +616,18 @@ const UserDashboard = ({ user, initiatePayment }: {
                 <CreditCard className="mr-2 text-indigo-600" /> Recent Bookings
               </h2>
               {payments.length === 0 ? (
-                <div className="bg-gray-50 rounded-[2rem] p-12 text-center border border-dashed border-gray-200">
-                  <p className="text-gray-500">You haven't made any bookings yet.</p>
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-[2rem] p-12 text-center border border-dashed border-gray-200 dark:border-slate-700">
+                  <p className="text-gray-500 dark:text-gray-400">You haven't made any bookings yet.</p>
                   <Link to="/hostels" className="text-indigo-600 font-bold mt-4 inline-block">Browse Hostels</Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {payments.map((payment) => (
-                    <div key={payment.id} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div key={payment.id} className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="font-bold text-lg">{payment.hostelName}</h3>
-                          <p className="text-sm text-gray-500">{new Date(payment.createdAt).toLocaleDateString()}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(payment.createdAt).toLocaleDateString()}</p>
                         </div>
                         <span className={cn(
                           "px-3 py-1 rounded-full text-xs font-bold",
@@ -646,11 +655,11 @@ const UserDashboard = ({ user, initiatePayment }: {
                   <MapPin className="mr-2 text-blue-600" /> My Hostels
                 </h2>
                 {myHostels.length === 0 ? (
-                  <p className="text-gray-500 bg-gray-50 p-6 rounded-2xl">No hostels listed by you.</p>
+                  <p className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 p-6 rounded-2xl">No hostels listed by you.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myHostels.map(hostel => (
-                      <div key={hostel.id} className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div key={hostel.id} className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none relative overflow-hidden">
                         <div className={cn(
                           "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[8px] font-black uppercase tracking-widest",
                           hostel.status === 'approved' ? "bg-green-100 text-green-700" :
@@ -662,7 +671,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                           <img src={hostel.imageUrl} className="w-16 h-16 rounded-2xl object-cover" alt="" />
                           <div>
                             <h3 className="font-bold">{hostel.name}</h3>
-                            <p className="text-sm text-gray-500">₹{hostel.price}/month</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">₹{hostel.price}/month</p>
                           </div>
                         </div>
                         {hostel.status === 'approved' && !hostel.listingFeePaid && (
@@ -674,7 +683,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                               itemType: 'hostel',
                               description: `Listing Fee for ${hostel.name}`
                             })}
-                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none shadow-indigo-100"
                           >
                             Pay Listing Fee (₹100)
                           </button>
@@ -700,11 +709,11 @@ const UserDashboard = ({ user, initiatePayment }: {
                   <Utensils className="mr-2 text-orange-600" /> My Tiffin Services
                 </h2>
                 {myTiffins.length === 0 ? (
-                  <p className="text-gray-500 bg-gray-50 p-6 rounded-2xl">No tiffin services listed by you.</p>
+                  <p className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 p-6 rounded-2xl">No tiffin services listed by you.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myTiffins.map(tiffin => (
-                      <div key={tiffin.id} className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div key={tiffin.id} className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none relative overflow-hidden">
                         <div className={cn(
                           "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[8px] font-black uppercase tracking-widest",
                           tiffin.status === 'approved' ? "bg-green-100 text-green-700" :
@@ -716,7 +725,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                           <img src={tiffin.imageUrl} className="w-16 h-16 rounded-2xl object-cover" alt="" />
                           <div>
                             <h3 className="font-bold">{tiffin.name}</h3>
-                            <p className="text-sm text-gray-500">₹{tiffin.pricePerMeal}/meal</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">₹{tiffin.pricePerMeal}/meal</p>
                           </div>
                         </div>
                         {tiffin.status === 'approved' && !tiffin.listingFeePaid && (
@@ -728,7 +737,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                               itemType: 'tiffin',
                               description: `Listing Fee for ${tiffin.name}`
                             })}
-                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none shadow-indigo-100"
                           >
                             Pay Listing Fee (₹100)
                           </button>
@@ -754,11 +763,11 @@ const UserDashboard = ({ user, initiatePayment }: {
                   <ShoppingBag className="mr-2 text-green-600" /> My Market Items
                 </h2>
                 {myItems.length === 0 ? (
-                  <p className="text-gray-500 bg-gray-50 p-6 rounded-2xl">No items listed for sale.</p>
+                  <p className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 p-6 rounded-2xl">No items listed for sale.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myItems.map(item => (
-                      <div key={item.id} className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div key={item.id} className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none relative overflow-hidden">
                         <div className={cn(
                           "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[8px] font-black uppercase tracking-widest",
                           item.status === 'approved' ? "bg-green-100 text-green-700" :
@@ -770,7 +779,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                           <img src={item.imageUrl} className="w-16 h-16 rounded-2xl object-cover" alt="" />
                           <div>
                             <h3 className="font-bold">{item.title}</h3>
-                            <p className="text-sm text-gray-500">₹{item.price} • {item.availability}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">₹{item.price} • {item.availability}</p>
                           </div>
                         </div>
                         {item.status === 'rejected' && item.rejectionReason && (
@@ -789,11 +798,11 @@ const UserDashboard = ({ user, initiatePayment }: {
                   <Briefcase className="mr-2 text-purple-600" /> My Job Postings
                 </h2>
                 {myJobs.length === 0 ? (
-                  <p className="text-gray-500 bg-gray-50 p-6 rounded-2xl">No jobs posted by you.</p>
+                  <p className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 p-6 rounded-2xl">No jobs posted by you.</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myJobs.map(job => (
-                      <div key={job.id} className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                      <div key={job.id} className="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none relative overflow-hidden">
                         <div className={cn(
                           "absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[8px] font-black uppercase tracking-widest",
                           job.status === 'approved' ? "bg-green-100 text-green-700" :
@@ -807,7 +816,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                           </div>
                           <div>
                             <h3 className="font-bold">{job.title}</h3>
-                            <p className="text-sm text-gray-500">{job.company} • ₹{job.salary}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{job.company} • ₹{job.salary}</p>
                           </div>
                         </div>
                         {job.status === 'approved' && !job.listingFeePaid && (
@@ -819,7 +828,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                               itemType: 'job',
                               description: `Listing Fee for ${job.title}`
                             })}
-                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                            className="mt-4 w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none shadow-indigo-100"
                           >
                             Pay Listing Fee (₹20)
                           </button>
@@ -852,8 +861,8 @@ const UserDashboard = ({ user, initiatePayment }: {
                 <Bell className="mr-2 text-indigo-600" /> Notifications
               </h2>
               {notifications.length === 0 ? (
-                <div className="bg-gray-50 rounded-[2rem] p-12 text-center border border-dashed border-gray-200">
-                  <p className="text-gray-500">No notifications yet.</p>
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-[2rem] p-12 text-center border border-dashed border-gray-200 dark:border-slate-700">
+                  <p className="text-gray-500 dark:text-gray-400">No notifications yet.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -862,7 +871,7 @@ const UserDashboard = ({ user, initiatePayment }: {
                       key={notif.id} 
                       className={cn(
                         "p-6 rounded-[2rem] border transition-all flex items-start space-x-4",
-                        notif.read ? "bg-white border-gray-100 opacity-75" : "bg-indigo-50 border-indigo-100 shadow-sm"
+                        notif.read ? "bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 opacity-75" : "bg-indigo-50 border-indigo-100 shadow-sm dark:shadow-none"
                       )}
                     >
                       <div className={cn(
@@ -875,12 +884,12 @@ const UserDashboard = ({ user, initiatePayment }: {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-bold text-gray-900">{notif.title}</h3>
+                          <h3 className="font-bold text-gray-900 dark:text-gray-100">{notif.title}</h3>
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                             {new Date(notif.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">{notif.message}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{notif.message}</p>
                       </div>
                     </div>
                   ))}
@@ -1017,8 +1026,8 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
   return (
     <div className="pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Control Panel</h1>
-        <p className="text-gray-500">Global overview and management of Student Solution platform.</p>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">Admin Control Panel</h1>
+        <p className="text-gray-500 dark:text-gray-400">Global overview and management of Student Solution platform.</p>
       </div>
 
       {loading ? (
@@ -1036,18 +1045,18 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
               { label: 'Total Payments', value: stats.payments, icon: <CreditCard />, color: 'bg-green-50 text-green-600' },
               { label: 'Total Revenue', value: `₹${stats.revenue}`, icon: <BarChart3 />, color: 'bg-orange-50 text-orange-600' },
             ].map((stat, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+              <div key={idx} className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-3", stat.color)}>
                   {React.cloneElement(stat.icon as React.ReactElement, { size: 20 })}
                 </div>
                 <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-black text-gray-900">{stat.value}</h3>
+                <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100">{stat.value}</h3>
               </div>
             ))}
           </div>
 
           {/* Pending Approvals Section */}
-          <section className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
+          <section className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
             <h2 className="text-2xl font-bold mb-8 flex items-center">
               <Clock className="mr-2 text-yellow-600" /> Pending Approvals
               {stats.pending > 0 && (
@@ -1058,14 +1067,14 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
             </h2>
             
             {pendingRequests.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-[2rem] border border-dashed border-gray-200">
+              <div className="text-center py-12 bg-gray-50 dark:bg-slate-800 rounded-[2rem] border border-dashed border-gray-200 dark:border-slate-700">
                 <CheckCircle className="mx-auto text-gray-300 mb-4" size={48} />
-                <p className="text-gray-500 font-medium">All caught up! No pending requests.</p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium">All caught up! No pending requests.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {pendingRequests.map((req) => (
-                  <div key={req.id} className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 hover:border-indigo-200 transition-all group">
+                  <div key={req.id} className="bg-gray-50 dark:bg-slate-800 p-6 rounded-[2rem] border border-gray-100 dark:border-slate-800 hover:border-indigo-200 transition-all group">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-4">
                         <div className={cn(
@@ -1080,13 +1089,13 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                         </div>
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{req.type}</p>
-                          <h3 className="font-bold text-gray-900">{req.data.name || req.data.title}</h3>
+                          <h3 className="font-bold text-gray-900 dark:text-gray-100">{req.data.name || req.data.title}</h3>
                         </div>
                       </div>
                       <div className="flex space-x-2">
                         <button 
                           onClick={() => setEditingRequest(req)}
-                          className="p-2 bg-white text-gray-600 rounded-xl border border-gray-200 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                          className="p-2 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-400 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
                         >
                           <Edit size={18} />
                         </button>
@@ -1094,7 +1103,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                     </div>
                     
                     <div className="space-y-2 mb-6">
-                      <p className="text-sm text-gray-600 line-clamp-2">{req.data.description || req.data.address}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{req.data.description || req.data.address}</p>
                       <p className="text-sm font-bold text-indigo-600">₹{req.data.price || req.data.pricePerMeal || req.data.salary}</p>
                     </div>
 
@@ -1122,13 +1131,13 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Recent Payments */}
-            <section className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
+            <section className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
               <h2 className="text-2xl font-bold mb-8 flex items-center">
                 <CreditCard className="mr-2 text-indigo-600" /> Recent Transactions
               </h2>
               <div className="space-y-6">
                 {recentPayments.map(payment => (
-                  <div key={payment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                  <div key={payment.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl">
                     <div>
                       <p className="font-bold">{payment.hostelName}</p>
                       <p className="text-xs text-gray-400">{new Date(payment.createdAt).toLocaleString()}</p>
@@ -1143,13 +1152,13 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
             </section>
 
             {/* Users List */}
-            <section className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
+            <section className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
               <h2 className="text-2xl font-bold mb-8 flex items-center">
                 <Users className="mr-2 text-indigo-600" /> Registered Users
               </h2>
               <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {allUsers.map(u => (
-                  <div key={u.uid} className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-2xl transition-colors">
+                  <div key={u.uid} className="flex items-center space-x-4 p-3 hover:bg-gray-50 dark:bg-slate-800 rounded-2xl transition-colors">
                     <img src={u.photoURL} className="w-10 h-10 rounded-full" alt="" />
                     <div>
                       <p className="font-bold text-sm">{u.displayName}</p>
@@ -1162,25 +1171,25 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
           </div>
 
           {/* Admin Notifications */}
-          <section className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm">
+          <section className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
             <h2 className="text-2xl font-bold mb-8 flex items-center">
               <Bell className="mr-2 text-indigo-600" /> Admin Notifications
             </h2>
             {notifications.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No notifications.</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">No notifications.</p>
             ) : (
               <div className="space-y-4">
                 {notifications.map(notif => (
                   <div key={notif.id} className={cn(
                     "p-4 rounded-2xl border flex items-start space-x-4",
-                    notif.read ? "bg-white border-gray-100 opacity-60" : "bg-indigo-50 border-indigo-100"
+                    notif.read ? "bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 opacity-60" : "bg-indigo-50 border-indigo-100"
                   )}>
                     <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
                       <Bell size={16} />
                     </div>
                     <div>
                       <h4 className="font-bold text-sm">{notif.title}</h4>
-                      <p className="text-xs text-gray-600">{notif.message}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{notif.message}</p>
                       <p className="text-[10px] text-gray-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
                     </div>
                   </div>
@@ -1195,11 +1204,11 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-2xl rounded-[3rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[3rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
               >
                 <div className="flex justify-between items-center mb-8">
                   <h3 className="text-2xl font-black">Edit Listing</h3>
-                  <button onClick={() => setEditingRequest(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <button onClick={() => setEditingRequest(null)} className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors">
                     <X size={24} />
                   </button>
                 </div>
@@ -1214,7 +1223,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                         ...editingRequest,
                         data: { ...editingRequest.data, [editingRequest.type === 'hostel' || editingRequest.type === 'tiffin' ? 'name' : 'title']: e.target.value }
                       })}
-                      className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                      className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
                     />
                   </div>
                   <div>
@@ -1225,7 +1234,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                         ...editingRequest,
                         data: { ...editingRequest.data, [editingRequest.type === 'hostel' ? 'address' : 'description']: e.target.value }
                       })}
-                      className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold h-32"
+                      className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold h-32"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-6">
@@ -1238,7 +1247,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                           ...editingRequest,
                           data: { ...editingRequest.data, [editingRequest.type === 'hostel' || editingRequest.type === 'item' ? 'price' : editingRequest.type === 'tiffin' ? 'pricePerMeal' : 'salary']: Number(e.target.value) }
                         })}
-                        className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                        className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
                       />
                     </div>
                   </div>
@@ -1247,13 +1256,13 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                 <div className="flex space-x-4 mt-10">
                   <button 
                     onClick={handleSaveEdit}
-                    className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+                    className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none shadow-indigo-200"
                   >
                     Save Changes
                   </button>
                   <button 
                     onClick={() => setEditingRequest(null)}
-                    className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all"
+                    className="flex-1 bg-gray-100 dark:bg-slate-700/50 text-gray-600 dark:text-gray-400 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all"
                   >
                     Cancel
                   </button>
@@ -1268,23 +1277,23 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl"
+                className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[3rem] p-10 shadow-2xl"
               >
                 <h3 className="text-2xl font-black mb-4">Reject Listing</h3>
-                <p className="text-gray-500 mb-6">Please provide a reason for rejecting this listing. This will be sent to the user.</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">Please provide a reason for rejecting this listing. This will be sent to the user.</p>
                 
                 <textarea 
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="e.g., Incomplete details, inappropriate content..."
-                  className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-red-500 transition-all font-bold h-32 mb-8"
+                  className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-red-500 transition-all font-bold h-32 mb-8"
                 />
 
                 <div className="flex space-x-4">
                   <button 
                     onClick={handleReject}
                     disabled={!rejectionReason.trim()}
-                    className="flex-1 bg-red-600 text-white py-4 rounded-2xl font-black hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-200"
+                    className="flex-1 bg-red-600 text-white py-4 rounded-2xl font-black hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg dark:shadow-none shadow-red-200"
                   >
                     Confirm Rejection
                   </button>
@@ -1293,7 +1302,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
                       setRejectionModal(null);
                       setRejectionReason('');
                     }}
-                    className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all"
+                    className="flex-1 bg-gray-100 dark:bg-slate-700/50 text-gray-600 dark:text-gray-400 py-4 rounded-2xl font-black hover:bg-gray-200 transition-all"
                   >
                     Cancel
                   </button>
@@ -1841,8 +1850,8 @@ const FindMyStay = ({ user, initiatePayment }: {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <div className="flex items-center space-x-4 mb-2">
-            <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
-            <h1 className="text-3xl font-bold text-gray-900">FindMyStay</h1>
+            <Link to="/" className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">FindMyStay</h1>
             <button 
               onClick={() => {
                 if (user) {
@@ -1851,13 +1860,13 @@ const FindMyStay = ({ user, initiatePayment }: {
                   navigate('/auth');
                 }
               }}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold flex items-center space-x-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold flex items-center space-x-2 hover:bg-indigo-700 transition-all shadow-lg dark:shadow-none shadow-indigo-100"
             >
               <Plus size={18} />
               <span>List Your Hostel</span>
             </button>
           </div>
-          <p className="text-gray-500 ml-12">Discover the best hostels and PGs near your campus.</p>
+          <p className="text-gray-500 dark:text-gray-400 ml-12">Discover the best hostels and PGs near your campus.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
@@ -1865,13 +1874,13 @@ const FindMyStay = ({ user, initiatePayment }: {
             <input 
               type="text" 
               placeholder="Search by name or location..." 
-              className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-64"
+              className="pl-10 pr-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-64"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select 
-            className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+            className="px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-900"
             value={roomTypeFilter}
             onChange={(e) => setRoomTypeFilter(e.target.value)}
           >
@@ -1882,7 +1891,7 @@ const FindMyStay = ({ user, initiatePayment }: {
             <option value="Sharing">Sharing</option>
           </select>
           <select 
-            className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+            className="px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-900"
             value={acFilter}
             onChange={(e) => setAcFilter(e.target.value)}
           >
@@ -1904,7 +1913,7 @@ const FindMyStay = ({ user, initiatePayment }: {
               key={hostel.id}
               layoutId={hostel.id}
               onClick={() => setSelectedHostel(hostel)}
-              className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden shadow-sm dark:shadow-none hover:shadow-xl dark:shadow-none transition-all cursor-pointer group"
             >
               <div className="relative h-56 overflow-hidden">
                 <img 
@@ -1913,16 +1922,27 @@ const FindMyStay = ({ user, initiatePayment }: {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center space-x-1 shadow-sm">
+                <div className="absolute top-4 right-4 bg-white dark:bg-slate-900/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center space-x-1 shadow-sm dark:shadow-none">
                   <Star size={14} className="text-yellow-500 fill-yellow-500" />
-                  <span className="text-sm font-bold text-gray-900">{hostel.rating}</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{hostel.rating}</span>
                 </div>
+                {!hostel.ownerId && (
+                  <div className="absolute top-4 left-4 bg-gray-900/80 backdrop-blur-md px-3 py-1 rounded-full shadow-sm dark:shadow-none pointer-events-none">
+                    <span className="text-[10px] md:text-xs font-bold text-white tracking-widest uppercase">Demo</span>
+                  </div>
+                )}
+                {hostel.ownerId && hostel.status === 'approved' && (
+                  <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center shadow-sm dark:shadow-none pointer-events-none">
+                    <CheckCircle size={14} className="text-white mr-1" />
+                    <span className="text-[10px] md:text-xs font-bold text-white uppercase">Verified</span>
+                  </div>
+                )}
                 <div className="absolute bottom-4 left-4 flex gap-2">
-                  <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                  <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg dark:shadow-none">
                     {hostel.roomType}
                   </span>
                   {hostel.isAC && (
-                    <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                    <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg dark:shadow-none">
                       AC
                     </span>
                   )}
@@ -1930,23 +1950,23 @@ const FindMyStay = ({ user, initiatePayment }: {
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{hostel.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 transition-colors">{hostel.name}</h3>
                   <div className="text-right">
                     <span className="text-2xl font-black text-indigo-600">₹{hostel.price}</span>
                     <span className="text-gray-400 text-xs block">/month</span>
                   </div>
                 </div>
-                <p className="text-gray-500 text-sm mb-4 flex items-center">
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 flex items-center">
                   <MapPin size={14} className="mr-1" /> {hostel.address}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {hostel.amenities.slice(0, 3).map((amenity, idx) => (
-                    <span key={idx} className="bg-gray-50 text-gray-600 text-xs px-3 py-1 rounded-lg border border-gray-100">
+                    <span key={idx} className="bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 text-xs px-3 py-1 rounded-lg border border-gray-100 dark:border-slate-800">
                       {amenity}
                     </span>
                   ))}
                   {hostel.amenities.length > 3 && (
-                    <span className="bg-gray-50 text-gray-600 text-xs px-3 py-1 rounded-lg border border-gray-100">
+                    <span className="bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 text-xs px-3 py-1 rounded-lg border border-gray-100 dark:border-slate-800">
                       +{hostel.amenities.length - 3} more
                     </span>
                   )}
@@ -1976,11 +1996,11 @@ const FindMyStay = ({ user, initiatePayment }: {
             />
             <motion.div 
               layoutId={selectedHostel.id}
-              className="bg-white w-full max-w-4xl rounded-[32px] md:rounded-[40px] overflow-hidden relative z-10 shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]"
+              className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[32px] md:rounded-[40px] overflow-hidden relative z-10 shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]"
             >
               <button 
                 onClick={() => setSelectedHostel(null)}
-                className="absolute top-4 right-4 md:top-6 md:right-6 z-30 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-lg"
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-30 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all shadow-lg dark:shadow-none"
               >
                 <X size={20} />
               </button>
@@ -2000,7 +2020,7 @@ const FindMyStay = ({ user, initiatePayment }: {
                 </div>
                 <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 pointer-events-none">
                   {[selectedHostel.imageUrl, ...selectedHostel.images].map((_, idx) => (
-                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-sm"></div>
+                    <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white dark:bg-slate-900/60 shadow-sm dark:shadow-none"></div>
                   ))}
                 </div>
               </div>
@@ -2019,52 +2039,62 @@ const FindMyStay = ({ user, initiatePayment }: {
                     <span className="bg-green-100 text-green-600 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full">
                       {selectedHostel.availableRooms} Available
                     </span>
+                    {!selectedHostel.ownerId && (
+                      <span className="bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-gray-300 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
+                        Demo
+                      </span>
+                    )}
+                    {selectedHostel.ownerId && selectedHostel.status === 'approved' && (
+                      <span className="bg-green-100 text-green-600 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full flex items-center uppercase">
+                        <CheckCircle size={12} className="mr-1" /> Verified
+                      </span>
+                    )}
                   </div>
-                  <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 leading-tight">{selectedHostel.name}</h2>
-                  <p className="text-gray-500 flex items-center text-sm md:text-lg">
+                  <h2 className="text-2xl md:text-4xl font-black text-gray-900 dark:text-gray-100 mb-2 leading-tight">{selectedHostel.name}</h2>
+                  <p className="text-gray-500 dark:text-gray-400 flex items-center text-sm md:text-lg">
                     <MapPin size={16} className="mr-2 text-indigo-500 flex-shrink-0" /> {selectedHostel.address}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-                  <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100 dark:border-slate-800">
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold mb-1">Monthly Rent</p>
                     <p className="text-xl md:text-3xl font-black text-indigo-600">₹{selectedHostel.price}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100 dark:border-slate-800">
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold mb-1">Rating</p>
                     <div className="flex items-center space-x-1">
                       <Star size={18} className="text-yellow-500 fill-yellow-500 md:w-6 md:h-6" />
-                      <span className="text-xl md:text-2xl font-black text-gray-900">{selectedHostel.rating}</span>
+                      <span className="text-xl md:text-2xl font-black text-gray-900 dark:text-gray-100">{selectedHostel.rating}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="mb-6 md:mb-8">
-                  <h4 className="font-bold text-gray-900 mb-3 md:mb-4 text-base md:text-lg">Amenities</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-3 md:mb-4 text-base md:text-lg">Amenities</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                     {selectedHostel.amenities.map((amenity, idx) => (
-                      <div key={idx} className="flex items-center space-x-3 bg-white p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 shadow-sm">
+                      <div key={idx} className="flex items-center space-x-3 bg-white dark:bg-slate-900 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
                         <div className="w-7 h-7 md:w-8 md:h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 flex-shrink-0">
                           <Check size={14} className="md:w-4 md:h-4" />
                         </div>
-                        <span className="text-gray-700 font-medium text-sm md:text-base">{amenity}</span>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium text-sm md:text-base">{amenity}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Reviews Section */}
-                <div className="mb-8 border-t border-gray-100 pt-8">
-                  <h4 className="font-bold text-gray-900 mb-6 text-xl flex items-center">
+                <div className="mb-8 border-t border-gray-100 dark:border-slate-800 pt-8">
+                  <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-6 text-xl flex items-center">
                     <Star size={20} className="mr-2 text-yellow-500 fill-yellow-500" />
                     Reviews & Ratings
                   </h4>
 
                   {/* Review Form - Only for listed hostels */}
                   {selectedHostel.ownerId && user && (
-                    <div className="bg-gray-50 p-6 rounded-3xl mb-8 border border-gray-100">
-                      <p className="font-bold text-gray-900 mb-4">Add your review</p>
+                    <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-3xl mb-8 border border-gray-100 dark:border-slate-800">
+                      <p className="font-bold text-gray-900 dark:text-gray-100 mb-4">Add your review</p>
                       <div className="flex items-center space-x-2 mb-4">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -2085,7 +2115,7 @@ const FindMyStay = ({ user, initiatePayment }: {
                         value={newReview.comment}
                         onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
                         placeholder="Share your experience..."
-                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white mb-4 min-h-[100px] text-sm"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-900 mb-4 min-h-[100px] text-sm"
                       />
                       <button
                         onClick={() => handleAddReview(selectedHostel.id)}
@@ -2100,14 +2130,14 @@ const FindMyStay = ({ user, initiatePayment }: {
                   <div className="space-y-4">
                     {selectedHostel.reviews && selectedHostel.reviews.length > 0 ? (
                       selectedHostel.reviews.map((review) => (
-                        <div key={review.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                        <div key={review.id} className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-none">
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center space-x-2">
                               <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-xs">
                                 {review.userName.charAt(0)}
                               </div>
                               <div>
-                                <p className="font-bold text-gray-900 text-sm">{review.userName}</p>
+                                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{review.userName}</p>
                                 <p className="text-gray-400 text-[10px]">{new Date(review.createdAt).toLocaleDateString()}</p>
                               </div>
                             </div>
@@ -2116,11 +2146,11 @@ const FindMyStay = ({ user, initiatePayment }: {
                               <span className="text-[10px] font-bold text-yellow-700">{review.rating}</span>
                             </div>
                           </div>
-                          <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{review.comment}</p>
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                      <div className="text-center py-8 bg-gray-50 dark:bg-slate-800 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700">
                         <p className="text-gray-400 text-sm italic">No reviews yet. Be the first to review!</p>
                       </div>
                     )}
@@ -2135,14 +2165,14 @@ const FindMyStay = ({ user, initiatePayment }: {
                       item: selectedHostel,
                       description: `Rent Payment for ${selectedHostel.name}`
                     })}
-                    className="flex-1 bg-indigo-600 text-white py-4 md:py-5 rounded-2xl md:rounded-3xl font-bold text-base md:text-xl hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all flex items-center justify-center space-x-3"
+                    className="flex-1 bg-indigo-600 text-white py-4 md:py-5 rounded-2xl md:rounded-3xl font-bold text-base md:text-xl hover:bg-indigo-700 shadow-xl dark:shadow-none shadow-indigo-200 transition-all flex items-center justify-center space-x-3"
                   >
                     <ShoppingBag size={20} className="md:w-6 md:h-6" />
                     <span>Pay Rent Online</span>
                   </button>
                   <a 
                     href={`tel:${selectedHostel.contact}`}
-                    className="flex-1 bg-white text-indigo-600 border-2 border-indigo-100 py-4 md:py-5 rounded-2xl md:rounded-3xl font-bold text-base md:text-xl hover:bg-indigo-50 transition-all flex items-center justify-center space-x-3"
+                    className="flex-1 bg-white dark:bg-slate-900 text-indigo-600 border-2 border-indigo-100 py-4 md:py-5 rounded-2xl md:rounded-3xl font-bold text-base md:text-xl hover:bg-indigo-50 transition-all flex items-center justify-center space-x-3"
                   >
                     <Phone size={20} className="md:w-6 md:h-6" />
                     <span>Contact Owner</span>
@@ -2169,36 +2199,36 @@ const FindMyStay = ({ user, initiatePayment }: {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-2xl rounded-[40px] p-8 md:p-12 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[40px] p-8 md:p-12 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <button 
                 onClick={() => setIsAddingHostel(false)}
-                className="absolute top-6 right-6 w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition-all"
+                className="absolute top-6 right-6 w-10 h-10 bg-gray-100 dark:bg-slate-700/50 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 transition-all"
               >
                 <X size={24} />
               </button>
 
-              <h3 className="text-3xl font-black text-gray-900 mb-8">List Your Hostel</h3>
+              <h3 className="text-3xl font-black text-gray-900 dark:text-gray-100 mb-8">List Your Hostel</h3>
               
               <form onSubmit={handleAddHostel} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Hostel Name</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Hostel Name</label>
                     <input 
                       required
                       type="text" 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       placeholder="e.g. Green Valley Residency"
                       value={newHostel.name}
                       onChange={e => setNewHostel({...newHostel, name: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Monthly Rent (₹)</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Monthly Rent (₹)</label>
                     <input 
                       required
                       type="number" 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       placeholder="e.g. 8500"
                       value={newHostel.price}
                       onChange={e => setNewHostel({...newHostel, price: parseInt(e.target.value)})}
@@ -2207,11 +2237,11 @@ const FindMyStay = ({ user, initiatePayment }: {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Address</label>
+                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Address</label>
                   <input 
                     required
                     type="text" 
-                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     placeholder="Full address of the hostel"
                     value={newHostel.address}
                     onChange={e => setNewHostel({...newHostel, address: e.target.value})}
@@ -2220,9 +2250,9 @@ const FindMyStay = ({ user, initiatePayment }: {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Room Type</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Room Type</label>
                     <select 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       value={newHostel.roomType}
                       onChange={e => setNewHostel({...newHostel, roomType: e.target.value as any})}
                     >
@@ -2233,17 +2263,17 @@ const FindMyStay = ({ user, initiatePayment }: {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Available Rooms</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Available Rooms</label>
                     <input 
                       required
                       type="number" 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       value={newHostel.availableRooms}
                       onChange={e => setNewHostel({...newHostel, availableRooms: parseInt(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">AC / Non-AC</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">AC / Non-AC</label>
                     <div className="flex items-center h-14 space-x-4">
                       <label className="flex items-center cursor-pointer">
                         <input 
@@ -2252,18 +2282,18 @@ const FindMyStay = ({ user, initiatePayment }: {
                           checked={newHostel.isAC}
                           onChange={e => setNewHostel({...newHostel, isAC: e.target.checked})}
                         />
-                        <span className="ml-2 text-gray-700 font-medium">AC Available</span>
+                        <span className="ml-2 text-gray-700 dark:text-gray-300 font-medium">AC Available</span>
                       </label>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Contact Number</label>
+                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Contact Number</label>
                   <input 
                     required
                     type="text" 
-                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     placeholder="e.g. +91 9876543210"
                     value={newHostel.contact}
                     onChange={e => setNewHostel({...newHostel, contact: e.target.value})}
@@ -2272,22 +2302,22 @@ const FindMyStay = ({ user, initiatePayment }: {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Bank Account Number</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Bank Account Number</label>
                     <input 
                       required
                       type="text" 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       placeholder="Your bank account number"
                       value={newHostel.bankAccountNumber}
                       onChange={e => setNewHostel({...newHostel, bankAccountNumber: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">IFSC Code</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">IFSC Code</label>
                     <input 
                       required
                       type="text" 
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       placeholder="e.g. SBIN0001234"
                       value={newHostel.ifscCode}
                       onChange={e => setNewHostel({...newHostel, ifscCode: e.target.value})}
@@ -2296,10 +2326,10 @@ const FindMyStay = ({ user, initiatePayment }: {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Amenities (comma separated)</label>
+                  <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Amenities (comma separated)</label>
                   <input 
                     type="text" 
-                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     placeholder="WiFi, Laundry, Gym, Mess..."
                     onChange={e => setNewHostel({...newHostel, amenities: e.target.value.split(',').map(s => s.trim())})}
                   />
@@ -2307,17 +2337,17 @@ const FindMyStay = ({ user, initiatePayment }: {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Main Hostel Image</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Main Hostel Image</label>
                     <div className="flex items-center space-x-4">
-                      <label className="flex-1 flex flex-col items-center justify-center h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
+                      <label className="flex-1 flex flex-col items-center justify-center h-32 px-4 transition bg-white dark:bg-slate-900 border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
                         <span className="flex items-center space-x-2">
-                          <Plus className="w-6 h-6 text-gray-600" />
-                          <span className="font-medium text-gray-600">Click to upload main photo</span>
+                          <Plus className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                          <span className="font-medium text-gray-600 dark:text-gray-400">Click to upload main photo</span>
                         </span>
                         <input type="file" name="main_image" className="hidden" accept="image/*" onChange={e => handleFileChange(e, 'main')} />
                       </label>
                       {mainImagePreview && (
-                        <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100">
+                        <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800">
                           <img src={mainImagePreview} className="w-full h-full object-cover" alt="Preview" />
                         </div>
                       )}
@@ -2325,14 +2355,14 @@ const FindMyStay = ({ user, initiatePayment }: {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">Room & Interior Images</label>
+                    <label className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Room & Interior Images</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <label className="flex flex-col items-center justify-center h-24 transition bg-white border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
-                        <Plus className="w-6 h-6 text-gray-600" />
+                      <label className="flex flex-col items-center justify-center h-24 transition bg-white dark:bg-slate-900 border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
+                        <Plus className="w-6 h-6 text-gray-600 dark:text-gray-400" />
                         <input type="file" name="room_images" className="hidden" accept="image/*" multiple onChange={e => handleFileChange(e, 'rooms')} />
                       </label>
                       {roomImagesPreviews.map((preview, idx) => (
-                        <div key={idx} className="h-24 rounded-2xl overflow-hidden border border-gray-100 relative group">
+                        <div key={idx} className="h-24 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 relative group">
                           <img src={preview} className="w-full h-full object-cover" alt={`Room ${idx}`} />
                           <button 
                             type="button"
@@ -2355,7 +2385,7 @@ const FindMyStay = ({ user, initiatePayment }: {
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-bold text-xl hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-bold text-xl hover:bg-indigo-700 shadow-xl dark:shadow-none shadow-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Listing...' : 'List Hostel Now'}
                 </button>
@@ -2875,8 +2905,8 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
-          <h1 className="text-3xl font-bold text-gray-900">TiffinMate</h1>
+          <Link to="/" className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">TiffinMate</h1>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative">
@@ -2884,14 +2914,14 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
             <input 
               type="text" 
               placeholder="Search services..." 
-              className="pl-12 pr-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64"
+              className="pl-12 pr-6 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 w-full sm:w-64"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
           </div>
           <button 
             onClick={() => user ? setIsAdding(true) : alert('Please sign in to add a service')}
-            className="bg-orange-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg shadow-orange-100"
+            className="bg-orange-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-orange-700 transition-all flex items-center justify-center shadow-lg dark:shadow-none shadow-orange-100"
           >
             <Plus size={20} className="mr-2" /> List Service
           </button>
@@ -2903,17 +2933,28 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredServices.map(s => (
-            <div key={s.id} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:shadow-lg transition-all flex flex-col">
+            <div key={s.id} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-lg dark:shadow-none transition-all flex flex-col">
               <div className="relative">
                 <img src={s.imageUrl} className="w-full h-48 object-cover" alt="" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center space-x-1 shadow-sm">
+                <div className="absolute top-4 right-4 bg-white dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center space-x-1 shadow-sm dark:shadow-none">
                   <Star size={14} className="text-yellow-500 fill-yellow-500" />
                   <span className="text-sm font-bold">{s.rating}</span>
                 </div>
+                {!s.ownerId && (
+                  <div className="absolute top-4 left-4 bg-gray-900/80 backdrop-blur-md px-3 py-1 rounded-full shadow-sm pointer-events-none">
+                    <span className="text-[10px] md:text-xs font-bold text-white tracking-widest uppercase">Demo</span>
+                  </div>
+                )}
+                {s.ownerId && s.status === 'approved' && (
+                  <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center shadow-sm pointer-events-none">
+                    <CheckCircle size={14} className="text-white mr-1" />
+                    <span className="text-[10px] md:text-xs font-bold text-white uppercase">Verified</span>
+                  </div>
+                )}
               </div>
               <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{s.name}</h3>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2">{s.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{s.name}</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2">{s.description}</p>
                 
                 <div className="bg-orange-50 p-4 rounded-2xl mb-6">
                   <div className="flex justify-between items-center">
@@ -2937,26 +2978,26 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-800">
                     <p className="text-[10px] text-gray-400 font-bold uppercase">Weekly</p>
-                    <p className="text-lg font-bold text-gray-900">₹{s.subscriptionPlans.weekly}</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{s.subscriptionPlans.weekly}</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                  <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-800">
                     <p className="text-[10px] text-gray-400 font-bold uppercase">Monthly</p>
-                    <p className="text-lg font-bold text-gray-900">₹{s.subscriptionPlans.monthly}</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{s.subscriptionPlans.monthly}</p>
                   </div>
                 </div>
 
                 <div className="mt-auto flex gap-3">
                   <button 
                     onClick={() => { setSelectedService(s); setShowSubscription(true); }}
-                    className="flex-1 bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition-colors shadow-lg shadow-orange-100"
+                    className="flex-1 bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition-colors shadow-lg dark:shadow-none shadow-orange-100"
                   >
                     Subscribe
                   </button>
                   <button 
                     onClick={() => { setSelectedService(s); setShowReviews(true); }}
-                    className="px-4 bg-gray-50 text-gray-600 rounded-xl font-bold hover:bg-gray-100 transition-colors border border-gray-100"
+                    className="px-4 bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 rounded-xl font-bold hover:bg-gray-100 dark:bg-slate-700/50 transition-colors border border-gray-100 dark:border-slate-800"
                   >
                     Reviews
                   </button>
@@ -2972,46 +3013,46 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
         {isAdding && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold mb-8">List Your Tiffin Service</h2>
               <form onSubmit={handleAddService} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Service Name</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.name} onChange={e => setNewService({...newService, name: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.name} onChange={e => setNewService({...newService, name: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Contact Number</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.contact} onChange={e => setNewService({...newService, contact: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.contact} onChange={e => setNewService({...newService, contact: e.target.value})} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Description</label>
-                  <textarea required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 h-24" value={newService.description} onChange={e => setNewService({...newService, description: e.target.value})} />
+                  <textarea required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 h-24" value={newService.description} onChange={e => setNewService({...newService, description: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Per Meal (₹)</label>
-                    <input type="number" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.pricePerMeal} onChange={e => setNewService({...newService, pricePerMeal: e.target.value})} />
+                    <input type="number" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.pricePerMeal} onChange={e => setNewService({...newService, pricePerMeal: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Weekly (₹)</label>
-                    <input type="number" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.weeklyPrice} onChange={e => setNewService({...newService, weeklyPrice: e.target.value})} />
+                    <input type="number" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.weeklyPrice} onChange={e => setNewService({...newService, weeklyPrice: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Monthly (₹)</label>
-                    <input type="number" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.monthlyPrice} onChange={e => setNewService({...newService, monthlyPrice: e.target.value})} />
+                    <input type="number" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.monthlyPrice} onChange={e => setNewService({...newService, monthlyPrice: e.target.value})} />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Bank Account Number</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.bankAccountNumber} onChange={e => setNewService({...newService, bankAccountNumber: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.bankAccountNumber} onChange={e => setNewService({...newService, bankAccountNumber: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">IFSC Code</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.ifscCode} onChange={e => setNewService({...newService, ifscCode: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500" value={newService.ifscCode} onChange={e => setNewService({...newService, ifscCode: e.target.value})} />
                   </div>
                 </div>
 
@@ -3024,7 +3065,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                         <input 
                           type="text" 
                           placeholder="e.g. Dal, Rice, Roti" 
-                          className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                          className="w-full p-3 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                           value={day.items}
                           onChange={e => {
                             const updatedMenu = [...newService.fullMenu];
@@ -3040,13 +3081,13 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Upload Pamphlet / Photo</label>
                   <div className="flex items-center space-x-4">
-                    <label className="flex flex-col items-center justify-center w-32 h-32 transition bg-white border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-orange-400 focus:outline-none">
-                      <Plus className="w-6 h-6 text-gray-600" />
-                      <span className="text-[10px] font-bold text-gray-500 mt-2">Add Photo</span>
+                    <label className="flex flex-col items-center justify-center w-32 h-32 transition bg-white dark:bg-slate-900 border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-orange-400 focus:outline-none">
+                      <Plus className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                      <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 mt-2">Add Photo</span>
                       <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                     </label>
                     {serviceImagePreview && (
-                      <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100 relative group">
+                      <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 relative group">
                         <img src={serviceImagePreview} className="w-full h-full object-cover" alt="Preview" />
                         <button 
                           type="button"
@@ -3063,7 +3104,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-orange-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-700 transition-all shadow-xl shadow-orange-100 disabled:opacity-50"
+                  className="w-full bg-orange-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-700 transition-all shadow-xl dark:shadow-none shadow-orange-100 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Listing...' : 'List Service'}
                 </button>
@@ -3078,7 +3119,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
         {showMenu && selectedService && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowMenu(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl overflow-y-auto max-h-[80vh]">
               <h2 className="text-2xl font-bold mb-6">Weekly Menu - {selectedService.name}</h2>
               <div className="space-y-6">
                 {selectedService.fullMenu.map((dayMenu, idx) => (
@@ -3086,7 +3127,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                     <h4 className="font-bold text-orange-600 mb-2">{dayMenu.day}</h4>
                     <div className="flex flex-wrap gap-2">
                       {dayMenu.items.map((item, i) => (
-                        <span key={i} className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-lg">{item}</span>
+                        <span key={i} className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-slate-800 px-3 py-1 rounded-lg">{item}</span>
                       ))}
                     </div>
                   </div>
@@ -3102,11 +3143,11 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
         {showReviews && selectedService && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowReviews(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl overflow-y-auto max-h-[80vh]">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl overflow-y-auto max-h-[80vh]">
               <h2 className="text-2xl font-bold mb-6">Reviews - {selectedService.name}</h2>
               
               {user && (
-                <div className="mb-8 p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                <div className="mb-8 p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-800">
                   <h4 className="font-bold mb-4">Write a Review</h4>
                   <div className="flex space-x-2 mb-4">
                     {[1, 2, 3, 4, 5].map(star => (
@@ -3117,7 +3158,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                   </div>
                   <textarea 
                     placeholder="Your experience..." 
-                    className="w-full p-4 bg-white border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 h-24 mb-4"
+                    className="w-full p-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 h-24 mb-4"
                     value={newReview.comment}
                     onChange={e => setNewReview({...newReview, comment: e.target.value})}
                   />
@@ -3148,7 +3189,7 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                           <span className="text-xs font-bold">{r.rating}</span>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600">{r.comment}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{r.comment}</p>
                     </div>
                   ))
                 )}
@@ -3163,14 +3204,14 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
         {showSubscription && selectedService && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => !paymentStatus.includes('processing') && setShowSubscription(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl text-center">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl text-center">
               {paymentStatus === 'idle' && (
                 <>
                   <div className="w-20 h-20 bg-orange-50 rounded-3xl flex items-center justify-center text-orange-600 mx-auto mb-6">
                     <ShoppingBag size={40} />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">Choose Subscription</h3>
-                  <p className="text-gray-500 mb-8">Subscribe to <span className="font-bold text-gray-900">{selectedService.name}</span></p>
+                  <p className="text-gray-500 dark:text-gray-400 mb-8">Subscribe to <span className="font-bold text-gray-900 dark:text-gray-100">{selectedService.name}</span></p>
                   
                   <div className="grid grid-cols-2 gap-4 mb-8">
                     <button 
@@ -3180,10 +3221,10 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                         item: selectedService,
                         description: `Weekly Subscription for ${selectedService.name}`
                       })}
-                      className="p-6 bg-gray-50 rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all text-left group"
+                      className="p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all text-left group"
                     >
                       <p className="text-xs text-gray-400 font-bold uppercase mb-1">Weekly</p>
-                      <p className="text-2xl font-bold text-gray-900 group-hover:text-orange-600">₹{selectedService.subscriptionPlans.weekly}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-orange-600">₹{selectedService.subscriptionPlans.weekly}</p>
                     </button>
                     <button 
                       onClick={() => initiatePayment({
@@ -3192,14 +3233,14 @@ const TiffinMate = ({ user, initiatePayment, paymentStatus }: {
                         item: selectedService,
                         description: `Monthly Subscription for ${selectedService.name}`
                       })}
-                      className="p-6 bg-gray-50 rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all text-left group"
+                      className="p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all text-left group"
                     >
                       <p className="text-xs text-gray-400 font-bold uppercase mb-1">Monthly</p>
-                      <p className="text-2xl font-bold text-gray-900 group-hover:text-orange-600">₹{selectedService.subscriptionPlans.monthly}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-orange-600">₹{selectedService.subscriptionPlans.monthly}</p>
                     </button>
                   </div>
 
-                  <button onClick={() => setShowSubscription(false)} className="text-gray-400 font-bold hover:text-gray-600">Cancel</button>
+                  <button onClick={() => setShowSubscription(false)} className="text-gray-400 font-bold hover:text-gray-600 dark:text-gray-400">Cancel</button>
                 </>
               )}
             </motion.div>
@@ -3346,8 +3387,8 @@ const StudentSwap = ({ user, initiatePayment }: {
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
-          <h1 className="text-3xl font-bold text-gray-900">StudentSwap</h1>
+          <Link to="/" className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">StudentSwap</h1>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative">
@@ -3355,14 +3396,14 @@ const StudentSwap = ({ user, initiatePayment }: {
             <input 
               type="text" 
               placeholder="Search items..." 
-              className="pl-12 pr-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64"
+              className="pl-12 pr-6 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
           </div>
           <button 
             onClick={() => user ? setIsAdding(true) : alert('Please sign in to sell items')}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center shadow-lg shadow-indigo-100"
+            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center justify-center shadow-lg dark:shadow-none shadow-indigo-100"
           >
             <Plus size={20} className="mr-2" /> Sell Item
           </button>
@@ -3377,8 +3418,8 @@ const StudentSwap = ({ user, initiatePayment }: {
             className={cn(
               "px-6 py-2 rounded-full font-bold text-sm transition-all whitespace-nowrap",
               selectedCategory === cat 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
-                : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                ? "bg-indigo-600 text-white shadow-lg dark:shadow-none shadow-indigo-100" 
+                : "bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:bg-slate-700/50"
             )}
           >
             {cat}
@@ -3390,51 +3431,51 @@ const StudentSwap = ({ user, initiatePayment }: {
         {isAdding && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold mb-8">List Your Item</h2>
               <form onSubmit={handleAddItem} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Item Title</label>
-                  <input type="text" placeholder="e.g. Engineering Physics Textbook" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.title} onChange={e => setNewItem({...newItem, title: e.target.value})} />
+                  <input type="text" placeholder="e.g. Engineering Physics Textbook" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.title} onChange={e => setNewItem({...newItem, title: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Price (₹)</label>
-                    <input type="number" placeholder="Price" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} />
+                    <input type="number" placeholder="Price" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Category</label>
-                    <select className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})}>
+                    <select className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})}>
                       {categories.filter(c => c !== 'All').map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Description</label>
-                  <textarea placeholder="Tell us more about the item..." className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 h-32" value={newItem.description} onChange={e => setNewItem({...newItem, description: e.target.value})} />
+                  <textarea placeholder="Tell us more about the item..." className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 h-32" value={newItem.description} onChange={e => setNewItem({...newItem, description: e.target.value})} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Bank Account Number</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.bankAccountNumber} onChange={e => setNewItem({...newItem, bankAccountNumber: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.bankAccountNumber} onChange={e => setNewItem({...newItem, bankAccountNumber: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">IFSC Code</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.ifscCode} onChange={e => setNewItem({...newItem, ifscCode: e.target.value})} />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500" value={newItem.ifscCode} onChange={e => setNewItem({...newItem, ifscCode: e.target.value})} />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Item Image</label>
                   <div className="flex items-center space-x-4">
-                    <label className="flex flex-col items-center justify-center w-32 h-32 transition bg-white border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
-                      <Plus className="w-6 h-6 text-gray-600" />
-                      <span className="text-[10px] font-bold text-gray-500 mt-2">Add Photo</span>
+                    <label className="flex flex-col items-center justify-center w-32 h-32 transition bg-white dark:bg-slate-900 border-2 border-gray-300 border-dashed rounded-2xl appearance-none cursor-pointer hover:border-indigo-400 focus:outline-none">
+                      <Plus className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                      <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 mt-2">Add Photo</span>
                       <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                     </label>
                     {itemImagePreview && (
-                      <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100 relative group">
+                      <div className="w-32 h-32 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 relative group">
                         <img src={itemImagePreview} className="w-full h-full object-cover" alt="Preview" />
                         <button 
                           type="button"
@@ -3451,7 +3492,7 @@ const StudentSwap = ({ user, initiatePayment }: {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 disabled:opacity-50"
+                  className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl dark:shadow-none shadow-indigo-100 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Posting...' : 'Post Item'}
                 </button>
@@ -3466,7 +3507,7 @@ const StudentSwap = ({ user, initiatePayment }: {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredItems.map(item => (
-            <div key={item.id} className="bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all flex flex-col relative">
+            <div key={item.id} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-lg dark:shadow-none transition-all flex flex-col relative">
               {item.availability === 'Sold' ? (
                 <div className="absolute top-4 left-4 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                   Sold
@@ -3476,10 +3517,21 @@ const StudentSwap = ({ user, initiatePayment }: {
                   Available
                 </div>
               )}
+              {item.sellerId === 'system' && (
+                <div className="absolute top-4 right-4 z-10 bg-gray-900/80 backdrop-blur-md px-3 py-1 rounded-full shadow-sm pointer-events-none">
+                  <span className="text-[10px] md:text-xs font-bold text-white tracking-widest uppercase">Demo</span>
+                </div>
+              )}
+              {item.sellerId !== 'system' && item.status === 'approved' && (
+                <div className="absolute top-4 right-4 z-10 bg-green-500/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center shadow-sm pointer-events-none">
+                  <CheckCircle size={14} className="text-white mr-1" />
+                  <span className="text-[10px] md:text-xs font-bold text-white uppercase">Verified</span>
+                </div>
+              )}
               <img src={item.imageUrl} className="w-full h-40 object-cover" alt="" />
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-1">
-                  <h3 className="font-bold text-gray-900 line-clamp-1">{item.title}</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 line-clamp-1">{item.title}</h3>
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[10px] text-gray-400 font-bold uppercase">{item.category}</p>
@@ -3490,10 +3542,10 @@ const StudentSwap = ({ user, initiatePayment }: {
                 <div className="mt-auto pt-4 border-t border-gray-50 flex flex-col gap-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500">
+                      <div className="w-6 h-6 bg-gray-100 dark:bg-slate-700/50 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400">
                         {item.sellerName?.[0]}
                       </div>
-                      <span className="text-[10px] text-gray-500 font-medium">{item.sellerName}</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">{item.sellerName}</span>
                     </div>
                     {user?.uid === item.sellerId && (
                       <button onClick={() => handleDelete(item.id)} className="text-red-400 hover:text-red-600 transition-colors">
@@ -3648,8 +3700,8 @@ const JobFinder = ({ user, initiatePayment }: {
     <div className="pt-24 pb-12 px-4 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
-          <h1 className="text-3xl font-bold text-gray-900">Job Finder</h1>
+          <Link to="/" className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors"><ArrowLeft size={24} /></Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Job Finder</h1>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative">
@@ -3657,14 +3709,14 @@ const JobFinder = ({ user, initiatePayment }: {
             <input 
               type="text" 
               placeholder="Search jobs or location..." 
-              className="pl-12 pr-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-64"
+              className="pl-12 pr-6 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-64"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
           </div>
           <button 
             onClick={() => user ? setIsAdding(true) : alert('Please sign in to post a job')}
-            className="bg-purple-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-purple-700 transition-all flex items-center justify-center shadow-lg shadow-purple-100"
+            className="bg-purple-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-purple-700 transition-all flex items-center justify-center shadow-lg dark:shadow-none shadow-purple-100"
           >
             <Plus size={20} className="mr-2" /> Post a Job
           </button>
@@ -3676,17 +3728,17 @@ const JobFinder = ({ user, initiatePayment }: {
       ) : (
         <div className="space-y-6">
           {filteredJobs.map(j => (
-            <div key={j.id} className="bg-white p-8 rounded-[2rem] border border-gray-100 hover:shadow-lg transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div key={j.id} className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-gray-100 dark:border-slate-800 hover:shadow-lg dark:shadow-none transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-start space-x-6">
                 <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
                   <Briefcase size={28} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{j.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{j.title}</h3>
                   <p className="text-purple-600 font-semibold mb-2">{j.company}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center"><MapPin size={14} className="mr-1" /> {j.location}</span>
-                    <span className="flex items-center font-bold text-gray-700">₹ {j.salary}</span>
+                    <span className="flex items-center font-bold text-gray-700 dark:text-gray-300">₹ {j.salary}</span>
                     <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-md font-bold text-[10px] uppercase tracking-wider">{j.type}</span>
                   </div>
                 </div>
@@ -3701,7 +3753,7 @@ const JobFinder = ({ user, initiatePayment }: {
           ))}
           {filteredJobs.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-gray-500">No jobs found matching your search.</p>
+              <p className="text-gray-500 dark:text-gray-400">No jobs found matching your search.</p>
             </div>
           )}
         </div>
@@ -3712,36 +3764,36 @@ const JobFinder = ({ user, initiatePayment }: {
         {isAdding && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-2xl font-bold">Post a New Job</h2>
-                <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={24} /></button>
+                <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors"><X size={24} /></button>
               </div>
               <form onSubmit={handleAddJob} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Job Title</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.title} onChange={e => setNewJob({...newJob, title: e.target.value})} placeholder="e.g. Content Writer" />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.title} onChange={e => setNewJob({...newJob, title: e.target.value})} placeholder="e.g. Content Writer" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Company Name</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.company} onChange={e => setNewJob({...newJob, company: e.target.value})} placeholder="e.g. EduTech Solutions" />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.company} onChange={e => setNewJob({...newJob, company: e.target.value})} placeholder="e.g. EduTech Solutions" />
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Location</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.location} onChange={e => setNewJob({...newJob, location: e.target.value})} placeholder="e.g. Remote / Near Campus" />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.location} onChange={e => setNewJob({...newJob, location: e.target.value})} placeholder="e.g. Remote / Near Campus" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Salary Range</label>
-                    <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.salary} onChange={e => setNewJob({...newJob, salary: e.target.value})} placeholder="e.g. ₹5000 - ₹8000 / month" />
+                    <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.salary} onChange={e => setNewJob({...newJob, salary: e.target.value})} placeholder="e.g. ₹5000 - ₹8000 / month" />
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Job Type</label>
-                    <select className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.type} onChange={e => setNewJob({...newJob, type: e.target.value as any})}>
+                    <select className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.type} onChange={e => setNewJob({...newJob, type: e.target.value as any})}>
                       <option value="Part-time">Part-time</option>
                       <option value="Full-time">Full-time</option>
                       <option value="Internship">Internship</option>
@@ -3749,25 +3801,25 @@ const JobFinder = ({ user, initiatePayment }: {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Last Date to Apply</label>
-                    <input type="date" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.lastDate} onChange={e => setNewJob({...newJob, lastDate: e.target.value})} />
+                    <input type="date" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.lastDate} onChange={e => setNewJob({...newJob, lastDate: e.target.value})} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Contact Email/Link</label>
-                  <input type="text" required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.contact} onChange={e => setNewJob({...newJob, contact: e.target.value})} placeholder="e.g. hr@edutech.com" />
+                  <input type="text" required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500" value={newJob.contact} onChange={e => setNewJob({...newJob, contact: e.target.value})} placeholder="e.g. hr@edutech.com" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Eligibility</label>
-                  <textarea required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 h-24" value={newJob.eligibility} onChange={e => setNewJob({...newJob, eligibility: e.target.value})} placeholder="e.g. Excellent writing skills, any degree." />
+                  <textarea required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 h-24" value={newJob.eligibility} onChange={e => setNewJob({...newJob, eligibility: e.target.value})} placeholder="e.g. Excellent writing skills, any degree." />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-400 uppercase">Job Description</label>
-                  <textarea required className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 h-32" value={newJob.description} onChange={e => setNewJob({...newJob, description: e.target.value})} placeholder="Describe the role and responsibilities..." />
+                  <textarea required className="w-full p-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 h-32" value={newJob.description} onChange={e => setNewJob({...newJob, description: e.target.value})} placeholder="Describe the role and responsibilities..." />
                 </div>
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl shadow-purple-100 disabled:opacity-50"
+                  className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl dark:shadow-none shadow-purple-100 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Posting...' : 'Post Job Listing'}
                 </button>
@@ -3791,7 +3843,7 @@ const JobFinder = ({ user, initiatePayment }: {
               initial={{ opacity: 0, scale: 0.9, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.9, y: 20 }} 
-              className="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="relative bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] p-10 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center space-x-4">
@@ -3799,11 +3851,11 @@ const JobFinder = ({ user, initiatePayment }: {
                     <Briefcase size={32} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{selectedJob.title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{selectedJob.title}</h2>
                     <p className="text-purple-600 font-bold">{selectedJob.company}</p>
                   </div>
                 </div>
-                <button onClick={() => setSelectedJob(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <button onClick={() => setSelectedJob(null)} className="p-2 hover:bg-gray-100 dark:bg-slate-700/50 rounded-full transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -3812,21 +3864,21 @@ const JobFinder = ({ user, initiatePayment }: {
                 <div className="space-y-4">
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Location</label>
-                    <p className="text-gray-900 font-medium">{selectedJob.location}</p>
+                    <p className="text-gray-900 dark:text-gray-100 font-medium">{selectedJob.location}</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Salary</label>
-                    <p className="text-gray-900 font-medium">{selectedJob.salary}</p>
+                    <p className="text-gray-900 dark:text-gray-100 font-medium">{selectedJob.salary}</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Job Type</label>
-                    <p className="text-gray-900 font-medium">{selectedJob.type}</p>
+                    <p className="text-gray-900 dark:text-gray-100 font-medium">{selectedJob.type}</p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date of Listing</label>
-                    <p className="text-gray-900 font-medium">{new Date(selectedJob.createdAt).toLocaleDateString()}</p>
+                    <p className="text-gray-900 dark:text-gray-100 font-medium">{new Date(selectedJob.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Last Date for Applying</label>
@@ -3842,17 +3894,17 @@ const JobFinder = ({ user, initiatePayment }: {
               <div className="space-y-6 mb-10">
                 <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Eligibility</label>
-                  <p className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100">{selectedJob.eligibility}</p>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">{selectedJob.eligibility}</p>
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Job Description</label>
-                  <p className="text-gray-600 leading-relaxed">{selectedJob.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{selectedJob.description}</p>
                 </div>
               </div>
 
               <button 
                 onClick={() => window.location.href = `mailto:${selectedJob.contact}`}
-                className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl shadow-purple-100"
+                className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl dark:shadow-none shadow-purple-100"
               >
                 Apply Now
               </button>
@@ -3905,13 +3957,13 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl text-center border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-800 px-4">
+      <div className="max-w-md w-full bg-white dark:bg-slate-900 p-12 rounded-[3rem] shadow-2xl text-center border border-gray-100 dark:border-slate-800">
         <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-10">
           <Home size={40} />
         </div>
         <h1 className="text-3xl font-bold mb-4">Welcome to Student Solution</h1>
-        <p className="text-gray-500 mb-8">Sign in to access all student utilities and connect with your community.</p>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">Sign in to access all student utilities and connect with your community.</p>
         
         {error && (
           <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-medium border border-red-100">
@@ -3923,7 +3975,7 @@ const AuthPage = () => {
           onClick={handleLogin} 
           disabled={isLoggingIn}
           className={cn(
-            "w-full flex items-center justify-center space-x-4 bg-white border-2 border-gray-100 py-4 rounded-2xl font-bold transition-all",
+            "w-full flex items-center justify-center space-x-4 bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 py-4 rounded-2xl font-bold transition-all",
             isLoggingIn ? "opacity-50 cursor-not-allowed" : "hover:border-indigo-600"
           )}
         >
@@ -3945,6 +3997,18 @@ export default function App() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success'>('idle');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentContext, setPaymentContext] = useState<{
@@ -4255,7 +4319,7 @@ export default function App() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
       <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
@@ -4263,8 +4327,8 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-indigo-100">
-          <Navbar user={user} onLogout={handleLogout} isAdmin={isAdmin} />
+        <div className="min-h-screen bg-white dark:bg-slate-900 font-sans text-gray-900 dark:text-gray-100 selection:bg-indigo-100">
+          <Navbar user={user} onLogout={handleLogout} isAdmin={isAdmin} theme={theme} setTheme={setTheme} />
           <main>
             <Routes>
               <Route path="/" element={<HomeView />} />
@@ -4278,7 +4342,7 @@ export default function App() {
             </Routes>
           </main>
           
-          <footer className="bg-gray-50 py-20 mt-20 border-t border-gray-100">
+          <footer className="bg-gray-50 dark:bg-slate-800 py-20 mt-20 border-t border-gray-100 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-4 text-center">
               <div className="flex items-center justify-center space-x-2 mb-6">
                 <div className="w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center">
@@ -4306,23 +4370,23 @@ export default function App() {
                   initial={{ scale: 0.9, opacity: 0, y: 20 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                  className="bg-white w-full max-w-md rounded-[40px] p-10 relative z-10 shadow-2xl text-center"
+                  className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[40px] p-10 relative z-10 shadow-2xl text-center"
                 >
                   {paymentStatus === 'idle' && paymentContext && (
                     <>
                       <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center text-indigo-600 mx-auto mb-6">
                         <CreditCard size={40} />
                       </div>
-                      <h3 className="text-3xl font-black text-gray-900 mb-2">Confirm Payment</h3>
-                      <p className="text-gray-500 mb-8">{paymentContext.description}</p>
+                      <h3 className="text-3xl font-black text-gray-900 dark:text-gray-100 mb-2">Confirm Payment</h3>
+                      <p className="text-gray-500 dark:text-gray-400 mb-8">{paymentContext.description}</p>
                       
-                      <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 mb-8 text-left">
+                      <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 mb-8 text-left">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-500">Amount</span>
-                          <span className="font-bold text-gray-900">₹{paymentContext.amount}</span>
+                          <span className="text-gray-500 dark:text-gray-400">Amount</span>
+                          <span className="font-bold text-gray-900 dark:text-gray-100">₹{paymentContext.amount}</span>
                         </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                          <span className="text-gray-900 font-bold">Total</span>
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-slate-700">
+                          <span className="text-gray-900 dark:text-gray-100 font-bold">Total</span>
                           <span className="text-2xl font-black text-indigo-600">₹{paymentContext.amount}</span>
                         </div>
                       </div>
@@ -4330,13 +4394,13 @@ export default function App() {
                       <div className="flex flex-col gap-4">
                         <button 
                           onClick={handlePayment}
-                          className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-bold text-xl hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all"
+                          className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-bold text-xl hover:bg-indigo-700 shadow-xl dark:shadow-none shadow-indigo-200 transition-all"
                         >
                           Pay Now
                         </button>
                         <button 
                           onClick={() => setShowPaymentModal(false)}
-                          className="w-full text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                          className="w-full text-gray-400 font-bold hover:text-gray-600 dark:text-gray-400 transition-colors"
                         >
                           Cancel
                         </button>
@@ -4348,7 +4412,7 @@ export default function App() {
                     <div className="py-12">
                       <div className="w-20 h-20 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-8"></div>
                       <h3 className="text-2xl font-bold mb-2">Processing Payment</h3>
-                      <p className="text-gray-500">Securely connecting to gateway...</p>
+                      <p className="text-gray-500 dark:text-gray-400">Securely connecting to gateway...</p>
                     </div>
                   )}
 
@@ -4362,7 +4426,7 @@ export default function App() {
                         <Check size={48} />
                       </motion.div>
                       <h3 className="text-3xl font-bold mb-2">Payment Successful!</h3>
-                      <p className="text-gray-500">Your transaction has been confirmed.</p>
+                      <p className="text-gray-500 dark:text-gray-400">Your transaction has been confirmed.</p>
                     </div>
                   )}
                 </motion.div>
