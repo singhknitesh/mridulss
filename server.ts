@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import cors from "cors";
 
 dotenv.config();
 
@@ -13,8 +14,13 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
+  // Allow all origins (or specify your custom domain here in the future)
+  app.use(cors({
+    origin: '*',
+    credentials: true
+  }));
   app.use(express.json());
   const razorpay: any = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET 
     ? new Razorpay({

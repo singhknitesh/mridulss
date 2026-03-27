@@ -253,6 +253,9 @@ interface Notification {
   link?: string;
 }
 
+// --- Configuration ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 // --- Helper Functions ---
 const getOrCreateRazorpayAccount = async (item: any, type: 'hostel' | 'tiffin' | 'market', user: any) => {
   if (item.razorpayAccountId) return item.razorpayAccountId;
@@ -262,7 +265,7 @@ const getOrCreateRazorpayAccount = async (item: any, type: 'hostel' | 'tiffin' |
   }
 
   try {
-    const response = await fetch('/api/payment/account', {
+    const response = await fetch(`${API_BASE_URL}/api/payment/account`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -4061,7 +4064,7 @@ export default function App() {
         }
       }
 
-      const response = await fetch('/api/payment/order', {
+      const response = await fetch(`${API_BASE_URL}/api/payment/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4201,7 +4204,7 @@ export default function App() {
         description: paymentContext.description,
         order_id: order.id,
         handler: async function (response: any) {
-          const verifyRes = await fetch('/api/payment/verify', {
+          const verifyRes = await fetch(`${API_BASE_URL}/api/payment/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
