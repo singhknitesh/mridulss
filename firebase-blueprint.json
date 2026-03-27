@@ -1,0 +1,185 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A student or provider in the system.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "email", "createdAt"]
+    },
+    "Hostel": {
+      "title": "Hostel",
+      "description": "Affordable student accommodation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "price": { "type": "number", "description": "Monthly rent" },
+        "amenities": { "type": "array", "items": { "type": "string" } },
+        "rating": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "Additional room images" },
+        "contact": { "type": "string" },
+        "availableRooms": { "type": "integer" },
+        "roomType": { "type": "string", "enum": ["Single", "Double", "Triple", "Sharing"] },
+        "isAC": { "type": "boolean" },
+        "reviews": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "userId": { "type": "string" },
+              "userName": { "type": "string" },
+              "rating": { "type": "number" },
+              "comment": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "bankAccountNumber": { "type": "string" },
+        "ifscCode": { "type": "string" }
+      },
+      "required": ["name", "address", "price", "roomType", "availableRooms", "ownerId", "createdAt", "bankAccountNumber", "ifscCode"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Rent payment record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "hostelId": { "type": "string" },
+        "hostelName": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Success", "Pending", "Failed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "hostelId", "amount", "status", "createdAt"]
+    },
+    "TiffinService": {
+      "title": "Tiffin Service",
+      "description": "Home-cooked food services for students.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "pricePerMeal": { "type": "number" },
+        "subscriptionPlans": {
+          "type": "object",
+          "properties": {
+            "weekly": { "type": "number" },
+            "monthly": { "type": "number" }
+          }
+        },
+        "fullMenu": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "day": { "type": "string" },
+              "items": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "description": "Weekly menu"
+        },
+        "imageUrl": { "type": "string" },
+        "contact": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviews": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "userId": { "type": "string" },
+              "userName": { "type": "string" },
+              "rating": { "type": "number" },
+              "comment": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "bankAccountNumber": { "type": "string" },
+        "ifscCode": { "type": "string" }
+      },
+      "required": ["name", "pricePerMeal", "subscriptionPlans", "ownerId", "createdAt", "bankAccountNumber", "ifscCode"]
+    },
+    "MarketItem": {
+      "title": "Marketplace Item",
+      "description": "Old items sold by students.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "availability": { "type": "string", "enum": ["Available", "Sold"] },
+        "bankAccountNumber": { "type": "string" },
+        "ifscCode": { "type": "string" }
+      },
+      "required": ["sellerId", "title", "price", "createdAt", "bankAccountNumber", "ifscCode"]
+    },
+    "Job": {
+      "title": "Job",
+      "description": "Part-time or student-friendly jobs.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "company": { "type": "string" },
+        "location": { "type": "string" },
+        "salary": { "type": "string" },
+        "type": { "type": "string", "enum": ["Part-time", "Full-time", "Internship"] },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "contact": { "type": "string" },
+        "lastDate": { "type": "string" },
+        "eligibility": { "type": "string" },
+        "postedBy": { "type": "string" }
+      },
+      "required": ["title", "company", "location", "type", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notification for users.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string", "description": "Recipient UID" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success", "error"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "User profiles" },
+    "hostels": { "schema": "Hostel", "description": "Hostel listings" },
+    "payments": { "schema": "Payment", "description": "Rent payment records" },
+    "tiffinServices": { "schema": "TiffinService", "description": "Tiffin service listings" },
+    "marketItems": { "schema": "MarketItem", "description": "Student marketplace items" },
+    "jobs": { "schema": "Job", "description": "Job listings" },
+    "notifications": { "schema": "Notification", "description": "User notifications" }
+  }
+}

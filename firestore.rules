@@ -1,0 +1,211 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "rahulpandeylk123@gmail.com" && request.auth.token.email_verified == true
+      );
+    }
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*$");
+    }
+
+    // Domain Validators
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             data.displayName is string && data.displayName.size() > 0 &&
+             isValidEmail(data.email) &&
+             isValidDateString(data.createdAt);
+    }
+
+    function isValidMarketItem(data) {
+      return data.keys().hasAll(['sellerId', 'sellerName', 'title', 'price', 'category', 'description', 'imageUrl', 'createdAt', 'availability', 'status', 'bankAccountNumber', 'ifscCode']) &&
+             data.sellerId is string &&
+             data.sellerName is string &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string &&
+             data.description is string && data.description.size() < 1000 &&
+             data.imageUrl is string &&
+             isValidDateString(data.createdAt) &&
+             data.availability in ['Available', 'Sold'] &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             data.bankAccountNumber is string && data.bankAccountNumber.size() > 0 &&
+             data.ifscCode is string && data.ifscCode.size() > 0 &&
+             (!('razorpayAccountId' in data) || data.razorpayAccountId is string) &&
+             (!('listingFeePaid' in data) || data.listingFeePaid is bool);
+    }
+
+    function isValidPayment(data) {
+      return data.keys().hasAll(['userId', 'amount', 'status', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.amount is number && data.amount > 0 &&
+             data.status in ['Success', 'Pending', 'Failed'] &&
+             isValidDateString(data.createdAt) &&
+             (!('hostelId' in data) || data.hostelId is string) &&
+             (!('hostelName' in data) || data.hostelName is string) &&
+             (!('serviceId' in data) || data.serviceId is string) &&
+             (!('serviceName' in data) || data.serviceName is string) &&
+             (!('itemId' in data) || data.itemId is string) &&
+             (!('itemTitle' in data) || data.itemTitle is string) &&
+             (!('type' in data) || data.type is string) &&
+             (!('razorpayOrderId' in data) || data.razorpayOrderId is string) &&
+             (!('razorpayPaymentId' in data) || data.razorpayPaymentId is string);
+    }
+
+    function isValidHostel(data) {
+      return data.keys().hasAll(['name', 'address', 'price', 'roomType', 'availableRooms', 'ownerId', 'createdAt', 'status', 'bankAccountNumber', 'ifscCode']) &&
+             data.ownerId is string &&
+             data.name is string && data.name.size() > 0 &&
+             data.price is number && data.price >= 0 &&
+             data.roomType in ['Single', 'Double', 'Triple', 'Sharing'] &&
+             data.availableRooms is number &&
+             isValidDateString(data.createdAt) &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             data.bankAccountNumber is string && data.bankAccountNumber.size() > 0 &&
+             data.ifscCode is string && data.ifscCode.size() > 0 &&
+             (!('rating' in data) || data.rating is number) &&
+             (!('reviews' in data) || data.reviews is list) &&
+             (!('razorpayAccountId' in data) || data.razorpayAccountId is string) &&
+             (!('listingFeePaid' in data) || data.listingFeePaid is bool);
+    }
+
+    function isValidTiffinService(data) {
+      return data.keys().hasAll(['name', 'pricePerMeal', 'subscriptionPlans', 'ownerId', 'createdAt', 'status', 'bankAccountNumber', 'ifscCode']) &&
+             data.ownerId is string &&
+             data.name is string && data.name.size() > 0 &&
+             data.pricePerMeal is number && data.pricePerMeal >= 0 &&
+             data.subscriptionPlans.weekly is number &&
+             data.subscriptionPlans.monthly is number &&
+             isValidDateString(data.createdAt) &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             data.bankAccountNumber is string && data.bankAccountNumber.size() > 0 &&
+             data.ifscCode is string && data.ifscCode.size() > 0 &&
+             (!('razorpayAccountId' in data) || data.razorpayAccountId is string) &&
+             (!('listingFeePaid' in data) || data.listingFeePaid is bool);
+    }
+
+    function isValidJob(data) {
+      return data.keys().hasAll(['title', 'company', 'location', 'salary', 'type', 'description', 'createdAt', 'postedBy', 'status']) &&
+             data.postedBy is string &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             isValidDateString(data.createdAt) &&
+             (!('razorpayAccountId' in data) || data.razorpayAccountId is string) &&
+             (!('listingFeePaid' in data) || data.listingFeePaid is bool);
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['userId', 'title', 'message', 'type', 'createdAt', 'read']) &&
+             data.userId is string &&
+             data.type in ['info', 'success', 'warning', 'error'] &&
+             data.read is bool &&
+             isValidDateString(data.createdAt);
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isAuthenticated() || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if (isOwner(userId) && isValidUser(request.resource.data)) || isAdmin();
+    }
+
+    match /hostels/{hostelId} {
+      allow read: if isAdmin() || 
+                   (!('status' in resource.data) || resource.data.status == 'approved') ||
+                   (isAuthenticated() && request.auth.uid == resource.data.ownerId);
+      allow create: if isAuthenticated() && 
+                    request.resource.data.ownerId == request.auth.uid &&
+                    request.resource.data.status == 'pending' && 
+                    isValidHostel(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        (request.auth.uid == resource.data.ownerId && 
+         request.resource.data.status == resource.data.status &&
+         isValidHostel(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reviews', 'rating'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['razorpayAccountId'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listingFeePaid']))
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.ownerId);
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
+      allow create: if isAuthenticated() && isValidPayment(request.resource.data);
+    }
+
+    match /tiffinServices/{serviceId} {
+      allow read: if isAdmin() || 
+                   (!('status' in resource.data) || resource.data.status == 'approved') ||
+                   (isAuthenticated() && request.auth.uid == resource.data.ownerId);
+      allow create: if isAuthenticated() && 
+                    request.resource.data.ownerId == request.auth.uid &&
+                    request.resource.data.status == 'pending' && 
+                    isValidTiffinService(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        (request.auth.uid == resource.data.ownerId && 
+         request.resource.data.status == resource.data.status &&
+         isValidTiffinService(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reviews', 'rating'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['razorpayAccountId'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listingFeePaid']))
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.ownerId);
+    }
+
+    match /marketItems/{itemId} {
+      allow read: if isAdmin() || 
+                   (!('status' in resource.data) || resource.data.status == 'approved') ||
+                   (isAuthenticated() && request.auth.uid == resource.data.sellerId);
+      allow create: if isAuthenticated() && 
+                    request.resource.data.sellerId == request.auth.uid && 
+                    request.resource.data.status == 'pending' &&
+                    isValidMarketItem(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        (request.auth.uid == resource.data.sellerId && 
+         request.resource.data.status == resource.data.status &&
+         isValidMarketItem(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['availability']) && request.resource.data.availability == 'Sold') ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['razorpayAccountId'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listingFeePaid']))
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.sellerId);
+    }
+
+    match /jobs/{jobId} {
+      allow read: if isAdmin() || 
+                   (!('status' in resource.data) || resource.data.status == 'approved') ||
+                   (isAuthenticated() && request.auth.uid == resource.data.postedBy);
+      allow create: if isAuthenticated() && 
+                    request.resource.data.postedBy == request.auth.uid &&
+                    request.resource.data.status == 'pending' &&
+                    isValidJob(request.resource.data);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        (request.auth.uid == resource.data.postedBy && 
+         request.resource.data.status == resource.data.status &&
+         isValidJob(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['razorpayAccountId'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listingFeePaid']))
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.postedBy);
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || (resource.data.userId == 'ADMIN' && isAdmin()));
+      allow create: if isAuthenticated(); 
+      allow update: if isAuthenticated() && (request.auth.uid == resource.data.userId || (resource.data.userId == 'ADMIN' && isAdmin())) && 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.userId || (resource.data.userId == 'ADMIN' && isAdmin()));
+    }
+  }
+}

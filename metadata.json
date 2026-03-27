@@ -1,0 +1,5 @@
+{
+  "name": "Student Solution",
+  "description": "A comprehensive utility platform for students to find hostels, tiffin services, buy/sell items, and find local jobs.",
+  "requestFramePermissions": ["geolocation"]
+}
