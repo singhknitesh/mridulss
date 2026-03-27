@@ -8,9 +8,11 @@ import {
   ShoppingBag, 
   Briefcase, 
   Search, 
-  Plus, 
-  User, 
-  LogOut, 
+  Plus,
+  User,
+  LogOut,
+  Heart,
+  Image as ImageIcon, 
   Star, 
   Phone, 
   Info,
@@ -486,7 +488,7 @@ const HomeView = () => {
 const UserDashboard = ({ user, initiatePayment }: { 
   user: FirebaseUser | null, 
   initiatePayment: (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -1321,7 +1323,7 @@ const AdminDashboard = ({ user }: { user: FirebaseUser | null }) => {
 const FindMyStay = ({ user, initiatePayment }: { 
   user: FirebaseUser | null, 
   initiatePayment: (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -2752,7 +2754,7 @@ const MOCK_TIFFIN_SERVICES: TiffinService[] = [
 const TiffinMate = ({ user, initiatePayment, paymentStatus }: { 
   user: FirebaseUser | null, 
   initiatePayment: (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -3285,7 +3287,7 @@ const MOCK_MARKET_ITEMS: MarketItem[] = [
 const StudentSwap = ({ user, initiatePayment }: { 
   user: FirebaseUser | null, 
   initiatePayment: (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -3580,7 +3582,7 @@ const StudentSwap = ({ user, initiatePayment }: {
 const JobFinder = ({ user, initiatePayment }: { 
   user: FirebaseUser | null, 
   initiatePayment: (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -4011,8 +4013,10 @@ export default function App() {
   }, [theme]);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success'>('idle');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportAmount, setSupportAmount] = useState('100');
   const [paymentContext, setPaymentContext] = useState<{
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -4020,7 +4024,7 @@ export default function App() {
   } | null>(null);
 
   const initiatePayment = async (context: {
-    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale';
+    type: 'listing_fee' | 'hostel_rent' | 'tiffin_subscription' | 'market_sale' | 'donation';
     amount: number;
     item: any;
     itemType?: 'hostel' | 'tiffin' | 'job' | 'market';
@@ -4040,7 +4044,7 @@ export default function App() {
       let transfers = [];
       let vendorAccountId = null;
 
-      if (paymentContext.type !== 'listing_fee') {
+      if (paymentContext.type !== 'listing_fee' && paymentContext.type !== 'donation') {
         const vendorType = paymentContext.type === 'hostel_rent' ? 'hostel' : 
                           paymentContext.type === 'tiffin_subscription' ? 'tiffin' : 'market';
         vendorAccountId = await getOrCreateRazorpayAccount(paymentContext.item, vendorType, user);
@@ -4159,6 +4163,15 @@ export default function App() {
                 razorpayPaymentId: mockResponse.razorpay_payment_id,
                 createdAt: new Date().toISOString()
               });
+            } else if (paymentContext.type === 'donation') {
+              await addDoc(collection(db, 'donations'), {
+                userId: user.uid,
+                amount: paymentContext.amount,
+                status: 'Success',
+                razorpayOrderId: mockResponse.razorpay_order_id,
+                razorpayPaymentId: mockResponse.razorpay_payment_id,
+                createdAt: new Date().toISOString()
+              });
             }
 
             setTimeout(() => {
@@ -4262,6 +4275,15 @@ export default function App() {
                 razorpayPaymentId: response.razorpay_payment_id,
                 createdAt: new Date().toISOString()
               });
+            } else if (paymentContext.type === 'donation') {
+              await addDoc(collection(db, 'donations'), {
+                userId: user.uid,
+                amount: paymentContext.amount,
+                status: 'Success',
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                createdAt: new Date().toISOString()
+              });
             }
 
             setTimeout(() => {
@@ -4342,18 +4364,85 @@ export default function App() {
             </Routes>
           </main>
           
-          <footer className="bg-gray-50 dark:bg-slate-800 py-20 mt-20 border-t border-gray-100 dark:border-slate-800">
-            <div className="max-w-7xl mx-auto px-4 text-center">
-              <div className="flex items-center justify-center space-x-2 mb-6">
-                <div className="w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center">
-                  <img src={logoImage} alt="Student Solution Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          <footer className="bg-gray-50 dark:bg-slate-800 py-16 mt-20 border-t border-gray-100 dark:border-slate-800">
+            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center">
+                    <img src={logoImage} alt="Student Solution Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  </div>
+                  <span className="font-bold text-xl tracking-tight">Student Solution</span>
                 </div>
-                <span className="font-bold text-xl tracking-tight">Student Solution</span>
+                <p className="text-gray-500 dark:text-gray-400 max-w-sm mb-4">Empowering students with essential utilities for a better campus life experience.</p>
+                <p className="text-gray-400 text-sm">© 2026 Student Solution.</p>
               </div>
-              <p className="text-gray-400 max-w-md mx-auto mb-8">Empowering students with essential utilities for a better campus life experience.</p>
-              <p className="text-gray-400 text-sm">© 2026 Student Solution. All rights reserved.</p>
+              
+              <div className="flex flex-col items-center md:items-start">
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-4 uppercase tracking-widest text-sm">Our Services</h4>
+                <div className="space-y-3 flex flex-col items-center md:items-start">
+                  <Link to="/hostels" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">Hostels</Link>
+                  <Link to="/tiffin" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">Tiffin Services</Link>
+                  <Link to="/swap" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">Student Swap (Market)</Link>
+                  <Link to="/jobs" className="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">Job Portal</Link>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center md:items-start">
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-4 uppercase tracking-widest text-sm">Support Us</h4>
+                <p className="text-gray-500 dark:text-gray-400 mb-4 text-center md:text-left">Love what we do? Your contributions help us keep the servers running and features growing!</p>
+                <button 
+                  onClick={() => user ? setShowSupportModal(true) : alert('Please login to support')}
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition"
+                >
+                  ❤️ Support our Company
+                </button>
+              </div>
             </div>
           </footer>
+
+          {/* Support Modal */}
+          <AnimatePresence>
+            {showSupportModal && (
+              <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSupportModal(false)} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+                <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[40px] p-8 relative z-10 shadow-2xl text-center">
+                  <div className="w-16 h-16 bg-pink-50 dark:bg-pink-900/30 rounded-3xl flex items-center justify-center text-pink-500 mx-auto mb-6">
+                    <Heart size={32} />
+                  </div>
+                  <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-2">Support Us</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">Enter any amount you'd like to chip in.</p>
+                  
+                  <div className="relative mb-6">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">₹</span>
+                    <input 
+                      type="number"
+                      value={supportAmount}
+                      onChange={e => setSupportAmount(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-800 rounded-3xl py-4 pl-12 pr-6 text-2xl font-black text-indigo-600 outline-none focus:border-indigo-500 focus:bg-white transition-all text-center"
+                    />
+                  </div>
+                  
+                  <button 
+                    onClick={() => {
+                      const finalAmount = parseInt(supportAmount);
+                      if (!finalAmount || finalAmount < 1) return alert('Enter a valid amount');
+                      setShowSupportModal(false);
+                      initiatePayment({
+                        type: 'donation',
+                        amount: finalAmount,
+                        item: { id: 'support_company', name: 'Support Student Solution' },
+                        description: 'Contribution to Student Solution Team'
+                      });
+                    }}
+                    className="w-full bg-indigo-600 text-white py-4 rounded-3xl font-bold hover:bg-indigo-700 shadow-xl dark:shadow-none shadow-indigo-200 transition-all mb-3 text-lg"
+                  >
+                    Pay with Razorpay
+                  </button>
+                  <button onClick={() => setShowSupportModal(false)} className="w-full text-gray-400 font-bold hover:text-gray-600 dark:hover:text-gray-300">Cancel</button>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
 
           {/* Global Payment Modal */}
           <AnimatePresence>
